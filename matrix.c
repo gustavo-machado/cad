@@ -5,7 +5,7 @@
 int main(void) {
 
     //matrix size
-    int n = 900;
+    int n = 2000;
 
     int i, j; // iterators
     int a[n][n], b[n], result1[n], result2[n];
@@ -28,7 +28,7 @@ int main(void) {
     }
 
     // Initializing all elements of result1 matrix to 0
-    for(i=0; i<r1; ++i)
+    for(i=0; i<n; ++i)
       {
         result1[i] = 0;
       }
@@ -47,7 +47,7 @@ int main(void) {
     double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
 
     // Initializing all elements of result2 matrix to 0
-    for(i=0; i<r1; ++i)
+    for(i=0; i<n; ++i)
       {
         result2[i] = 0;
       }
