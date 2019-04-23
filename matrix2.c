@@ -2,19 +2,36 @@
 #include <stdlib.h>
 #include <time.h>
 
-int main(){
-    int n = 0;
-    double **matriz = constroMatriz(n);
-    double *vetor = constroiVetor(n);
+double **populaMatriz(int n);
+double *populaVetor(int n);
+double *multiplicacaoColunas(double **matriz, double *vetor, int n);
+double *multiplicacaoLinhas(double **matriz, double *vetor, int n);
 
-    /** Vem a parte do Clock **/
+
+int main(){
+    int n = 23000;
+    double **matriz = populaMatriz(n);
+    double *vetor = populaVetor(n);
+    
+    clock_t start = clock();
+    double *teste1 = multiplicacaoColunas(matriz,vetor,n);
+    clock_t end = clock();
+    double tempo = (end - start)/CLOCKS_PER_SEC;
+    printf("O tempo da Mutiplicação mantendo coluna é %f\n",tempo);
+
+    clock_t start1 = clock();
+    double *teste2 = multiplicacaoLinhas(matriz,vetor,n);
+    clock_t end1 = clock();
+    double tempo1 = (end - start)/ CLOCKS_PER_SEC;
+    printf("O tempo da Mutiplicação mantendo linha é %f\n",tempo1);
 
 }   
-    /** Constroi a Matriz por meio de um ponteiro de ponteiro 
+   
+   /** Constroi a Matriz por meio de um ponteiro de ponteiro 
      * Em seguida, ele alocao nesse ponteiro de ponteiro um espaco de memoria de um ponteiro
      * Posteriormente, dentro de cada posicao da matriz ele aloca a posicao de um double
      * E finalmente coloca um valor aleatorio na mesma**/
-    double **constroiMatriz(int n){
+    double **populaMatriz(int n){
         double **matriz = malloc( n * sizeof(double *));
         for (int i=0; i < n; i++)
         {
@@ -29,7 +46,7 @@ int main(){
     /** Constroi o vetor por meio de um ponteiro 
      * Em seguida, ele alocao nesse ponteiro  um espaco de memoria de um double para cada posicao de memoria
      * E finalmente coloca um valor aleatorio na mesma**/
-    double *constroiVetor(int n){
+    double *populaVetor(int n){
         double *vetor = malloc( n * sizeof(double));
         for (int i=0; i < n; i++)
         {
