@@ -4,8 +4,8 @@
 
 int main(){
     int n = 0;
-    double **matriz = geramatriz(n);
-    double *vetor = geravetor(n);
+    double **matriz = constroMatriz(n);
+    double *vetor = constroiVetor(n);
 
     /** Vem a parte do Clock **/
 
