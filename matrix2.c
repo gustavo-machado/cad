@@ -9,21 +9,21 @@ double *multiplicacaoLinhas(double **matriz, double *vetor, int n);
 
 
 int main(){
-    int n = 23000;
+    int n = 17000;
     double **matriz = populaMatriz(n);
     double *vetor = populaVetor(n);
     
     clock_t start = clock();
     double *teste1 = multiplicacaoColunas(matriz,vetor,n);
     clock_t end = clock();
-    double tempo = (end - start)/CLOCKS_PER_SEC;
-    printf("O tempo da Mutiplicação mantendo coluna é %f\n",tempo);
+    double tempo = (double)(end - start)/CLOCKS_PER_SEC;
+    printf("O tempo da Multiplicacao mantendo coluna e %f\n",tempo);
 
     clock_t start1 = clock();
     double *teste2 = multiplicacaoLinhas(matriz,vetor,n);
     clock_t end1 = clock();
-    double tempo1 = (end - start)/ CLOCKS_PER_SEC;
-    printf("O tempo da Mutiplicação mantendo linha é %f\n",tempo1);
+    double tempo1 = (double)(end1 - start1)/ CLOCKS_PER_SEC;
+    printf("O tempo da Multiplicacao mantendo linha e %f\n",tempo1);
 
 }   
    
