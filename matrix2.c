@@ -9,7 +9,7 @@ double *multiplicacaoLinhas(double **matriz, double *vetor, int n);
 
 
 int main(){
-    int n = 17000;
+    int n = 1000;
     double **matriz = populaMatriz(n);
     double *vetor = populaVetor(n);
     
@@ -33,6 +33,7 @@ int main(){
      * E finalmente coloca um valor aleatorio na mesma**/
     double **populaMatriz(int n){
         double **matriz = malloc( n * sizeof(double *));
+        #pragma omp parallel for
         for (int i=0; i < n; i++)
         {
             matriz[i] = malloc(n * sizeof(double));
@@ -48,6 +49,7 @@ int main(){
      * E finalmente coloca um valor aleatorio na mesma**/
     double *populaVetor(int n){
         double *vetor = malloc( n * sizeof(double));
+        #pragma omp parallel for
         for (int i=0; i < n; i++)
         {
             vetor[i] = rand() % 100;
@@ -58,12 +60,19 @@ int main(){
      * Segue a mesma ideia do fortran, somente tendo o ponteiro pro resultado sendo alocado um espaco de memoria do tamanho double para cada posicao**/
     double *multiplicacaoLinhas(double **matriz, double *vetor, int n){
         double *resultado = malloc(n * sizeof(double));
+        double *resultado_privado = malloc(n * sizeof(double));
+        #pragma omp parallel for
         for (int i=0; i < n; i++)
         {
             for (int j=0; j < n; j++)
             {
-                resultado[i] += vetor[j] + matriz[i][j];
+                resultado_privado[i] += vetor[j] + matriz[i][j];
             }    
+        }
+        #pragma omp parallel critical
+        for (int i=0; i < n; i++)
+        {
+            resultado[i] += resultado_privado[i];
         }
         return resultado;
     }
@@ -71,12 +80,19 @@ int main(){
      * Segue a mesma ideia do fortran, somente tendo o ponteiro pro resultado sendo alocado um espaco de memoria do tamanho double para cada posicao**/
     double *multiplicacaoColunas(double **matriz, double *vetor, int n){
         double *resultado = malloc(n * sizeof(double));
+        double *resultado_privado = malloc(n * sizeof(double));
+        #pragma omp parallel for
         for (int j=0; j < n; j++)
         {
             for (int i=0; i < n; i++)
             {
-                resultado[i] += vetor[j] * matriz[i][j];
+                resultado_privado[i] += vetor[j] * matriz[i][j];
             }    
+        }
+        #pragma omp parallel critical
+        for (int i=0; i < n; i++)
+        {
+            resultado[i] += resultado_privado[i];
         }
         return resultado;
     }
