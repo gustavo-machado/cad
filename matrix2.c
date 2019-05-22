@@ -1,26 +1,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <omp.h>
 
 double **populaMatriz(int n);
 double *populaVetor(int n);
-double *multiplicacaoColunas(double **matriz, double *vetor, int n);
-double *multiplicacaoLinhas(double **matriz, double *vetor, int n);
+double *multiplicacaoColunas(double **matriz, double *vetor, int n, double *resultado2);
+double *multiplicacaoLinhas(double **matriz, double *vetor, int n, double *resultado1);
 
 
 int main(){
-    int n = 1000;
+    int n = 13000;
     double **matriz = populaMatriz(n);
     double *vetor = populaVetor(n);
-    
+    double *resultado1 = malloc(n * sizeof(double));
+    double *resultado2 = malloc(n * sizeof(double));
     clock_t start = clock();
-    double *teste1 = multiplicacaoColunas(matriz,vetor,n);
+    double *teste1 = multiplicacaoColunas(matriz,vetor,n,resultado2);
     clock_t end = clock();
     double tempo = (double)(end - start)/CLOCKS_PER_SEC;
     printf("O tempo da Multiplicacao mantendo coluna e %f\n",tempo);
 
     clock_t start1 = clock();
-    double *teste2 = multiplicacaoLinhas(matriz,vetor,n);
+    double *teste2 = multiplicacaoLinhas(matriz,vetor,n, resultado1);
     clock_t end1 = clock();
     double tempo1 = (double)(end1 - start1)/ CLOCKS_PER_SEC;
     printf("O tempo da Multiplicacao mantendo linha e %f\n",tempo1);
@@ -58,10 +60,10 @@ int main(){
     }
     /** Tipo de Multiplicacao 1 por linha
      * Segue a mesma ideia do fortran, somente tendo o ponteiro pro resultado sendo alocado um espaco de memoria do tamanho double para cada posicao**/
-    double *multiplicacaoLinhas(double **matriz, double *vetor, int n){
-        double *resultado = malloc(n * sizeof(double));
+    double *multiplicacaoLinhas(double **matriz, double *vetor, int n, double *resultado1){
+        
         double *resultado_privado = malloc(n * sizeof(double));
-        #pragma omp parallel for
+        #pragma omp parallel for num_threads(100)
         for (int i=0; i < n; i++)
         {
             for (int j=0; j < n; j++)
@@ -72,16 +74,17 @@ int main(){
         #pragma omp parallel critical
         for (int i=0; i < n; i++)
         {
-            resultado[i] += resultado_privado[i];
+            resultado1[i] += resultado_privado[i];
         }
-        return resultado;
+        free(resultado_privado);
+        return resultado1;
     }
     /** Tipo de Multiplicacao 2 por COLUNA
      * Segue a mesma ideia do fortran, somente tendo o ponteiro pro resultado sendo alocado um espaco de memoria do tamanho double para cada posicao**/
-    double *multiplicacaoColunas(double **matriz, double *vetor, int n){
-        double *resultado = malloc(n * sizeof(double));
+    double *multiplicacaoColunas(double **matriz, double *vetor, int n, double *resultado2){
+        
         double *resultado_privado = malloc(n * sizeof(double));
-        #pragma omp parallel for
+        #pragma omp parallel for num_threads(100)
         for (int j=0; j < n; j++)
         {
             for (int i=0; i < n; i++)
@@ -92,7 +95,8 @@ int main(){
         #pragma omp parallel critical
         for (int i=0; i < n; i++)
         {
-            resultado[i] += resultado_privado[i];
+            resultado2[i] += resultado_privado[i];
         }
-        return resultado;
+        free(resultado_privado);
+        return resultado2;
     }
