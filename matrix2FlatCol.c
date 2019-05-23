@@ -10,7 +10,7 @@ double *multiplicacaoColunas(double *vetor, int n, double *resultado, double *fl
 void freeArray(double **matriz, int n);
 
 int main(){
-    int n = 2;
+    int n = 10000;
     double **matriz = populaMatriz(n);
     double *vetor = populaVetor(n);
     double *resultado = malloc(n * sizeof(double));

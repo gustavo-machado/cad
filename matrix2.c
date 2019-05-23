@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <sys/time.h>
 #include <omp.h>
 
 double **populaMatriz(int n);
@@ -10,22 +11,24 @@ double *multiplicacaoLinhas(double **matriz, double *vetor, int n, double *resul
 
 
 int main(){
-    int n = 2;
+    int n = 10000;
     double **matriz = populaMatriz(n);
     double *vetor = populaVetor(n);
     double *resultado1 = malloc(n * sizeof(double));
     double *resultado2 = malloc(n * sizeof(double));
-    clock_t start = clock();
+    struct timeval t0, t1;
+	gettimeofday(&t0, 0);
     double *teste1 = multiplicacaoColunas(matriz,vetor,n,resultado2);
-    clock_t end = clock();
-    double tempo = (double)(end - start)/CLOCKS_PER_SEC;
-    printf("O tempo da Multiplicacao mantendo coluna e %f\n",tempo);
+    gettimeofday(&t1, 0);
+    double elapsed = (t1.tv_sec-t0.tv_sec) * 1.0f + (t1.tv_usec - t0.tv_usec) / 1000000.0f;
+    printf("O tempo da Multiplicacao mantendo coluna e %f\n",elapsed);
 
-    clock_t start1 = clock();
+    struct timeval t3, t4;
+	gettimeofday(&t3, 0);
     double *teste2 = multiplicacaoLinhas(matriz,vetor,n, resultado1);
-    clock_t end1 = clock();
-    double tempo1 = (double)(end1 - start1)/ CLOCKS_PER_SEC;
-    printf("O tempo da Multiplicacao mantendo linha e %f\n",tempo1);
+    gettimeofday(&t4, 0);
+    double elapsed2 = (t4.tv_sec-t3.tv_sec) * 1.0f + (t4.tv_usec - t3.tv_usec) / 1000000.0f;
+    printf("O tempo da Multiplicacao mantendo linha e %f\n",elapsed2);
 }   
    
    /** Constroi a Matriz por meio de um ponteiro de ponteiro 
