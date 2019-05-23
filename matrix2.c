@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <omp.h>
 
 double **populaMatriz(int n);
 double *populaVetor(int n);
@@ -9,7 +10,7 @@ double *multiplicacaoLinhas(double **matriz, double *vetor, int n, double *resul
 
 
 int main(){
-    int n = 13000;
+    int n = 2;
     double **matriz = populaMatriz(n);
     double *vetor = populaVetor(n);
     double *resultado1 = malloc(n * sizeof(double));
@@ -25,7 +26,6 @@ int main(){
     clock_t end1 = clock();
     double tempo1 = (double)(end1 - start1)/ CLOCKS_PER_SEC;
     printf("O tempo da Multiplicacao mantendo linha e %f\n",tempo1);
-
 }   
    
    /** Constroi a Matriz por meio de um ponteiro de ponteiro 
@@ -62,15 +62,16 @@ int main(){
     double *multiplicacaoLinhas(double **matriz, double *vetor, int n, double *resultado1){
         
         double *resultado_privado = malloc(n * sizeof(double));
-        #pragma omp parallel for num_threads(40)
+        #pragma omp parallel for num_threads(80)
         for (int i=0; i < n; i++)
         {
             for (int j=0; j < n; j++)
             {
                 resultado_privado[i] += vetor[j] * matriz[i][j];
-            }    
+            }
         }
-        #pragma omp parallel critical
+
+        #pragma omp critical
         for (int i=0; i < n; i++)
         {
             resultado1[i] += resultado_privado[i];
@@ -91,7 +92,7 @@ int main(){
                 resultado_privado[i] += vetor[j] * matriz[i][j];
             }    
         }
-        #pragma omp parallel critical
+        #pragma omp critical
         for (int i=0; i < n; i++)
         {
             resultado2[i] += resultado_privado[i];

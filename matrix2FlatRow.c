@@ -2,14 +2,15 @@
 #include <stdlib.h>
 #include <time.h>
 #include <sys/time.h>
+#include <omp.h>
 
 double **populaMatriz(int n);
 double *populaVetor(int n);
-double *multiplicacaoLinhas(double **matriz, double *vetor, int n, double *resultado, double *flatA);
-
+double *multiplicacaoLinhas(double *vetor, int n, double *resultado, double *flatA);
+void freeArray(double **matriz, int n);
 
 int main(){
-    int n = 13000;
+    int n = 2;
     double **matriz = populaMatriz(n);
     double *vetor = populaVetor(n);
     double *resultado = malloc(n * sizeof(double));
@@ -20,14 +21,14 @@ int main(){
             flatA[i * n + j] = matriz[i][j];
         }
     }
-    free(matriz);
+    freeArray(matriz, n);
 
     struct timeval t0, t1;
 	gettimeofday(&t0, 0);
-    double *teste1 = multiplicacaoLinhas(matriz,vetor,n,resultado,flatA);
+    double *teste1 = multiplicacaoLinhas(vetor,n,resultado,flatA);
     gettimeofday(&t1, 0);
     double elapsed = (t1.tv_sec-t0.tv_sec) * 1.0f + (t1.tv_usec - t0.tv_usec) / 1000000.0f;
-    printf("O tempo da Multiplicacao mantendo linha e %f\n",elapsed); */
+    printf("O tempo da Multiplicacao mantendo linha e %f\n",elapsed);
 
 }   
    
@@ -63,12 +64,12 @@ int main(){
     }
     /** Tipo de Multiplicacao 1 por linha
      * Segue a mesma ideia do fortran, somente tendo o ponteiro pro resultado sendo alocado um espaco de memoria do tamanho double para cada posicao**/
-    double *multiplicacaoLinhas(double **matriz, double *vetor, int n, double *resultado, double *flatA){
+    double *multiplicacaoLinhas(double *vetor, int n, double *resultado, double *flatA){
         double tot;
-        int ioff;
-        #pragma omp parallel shared(resultado) private(i, j, ioff, tot) num_threads(50)
+        int i, j, ioff;
+        #pragma omp parallel shared(resultado) private(i, j, ioff, tot) num_threads(80)
         {
-            #pragma omp for schedule(guided, 200)
+            #pragma omp for schedule(static)
             for (int i=0; i < n; i++)
             {
                 ioff = i * n;
@@ -82,3 +83,12 @@ int main(){
         }
         return resultado;
     }
+
+    void freeArray(double **matriz, int n) {
+        int i;
+        for (i = 0; i < n; ++i) {
+                free(matriz[i]);
+            }
+        free(matriz);
+    }
+
